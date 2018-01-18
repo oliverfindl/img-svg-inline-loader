@@ -49,7 +49,7 @@ Default options:
 		plugins: [
 			{
 				cleanupAttrs: true
-			}
+			},
 			// ...
 		]
 	}

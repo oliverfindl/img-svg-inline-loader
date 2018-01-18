@@ -1,5 +1,5 @@
 /**
- * img-svg-inline-loader v1.0.0 (2018-01-18)
+ * img-svg-inline-loader v1.0.1 (2018-01-18)
  * Copyright 2018 Oliver Findl
  * @license MIT
  */
