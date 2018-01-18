@@ -1,0 +1,27 @@
+{
+	"name": "img-svg-inline-loader",
+	"version": "1.0.0",
+	"description": "Webpack loader used for inline replacement of SVG reference in src attribute of img tags with actual content of SVG file.",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/oliverfindl/img-svg-inline-loader.git"
+	},
+	"keywords": [
+		"webpack",
+		"loader",
+		"img",
+		"svg",
+		"inline"
+	],
+	"author": "Oliver Findl",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/oliverfindl/img-svg-inline-loader/issues"
+	},
+	"homepage": "https://github.com/oliverfindl/img-svg-inline-loader#readme",
+	"dependencies": {
+		"loader-utils": "^1.1.0",
+		"svgo": "^1.0.3"
+	}
+}
