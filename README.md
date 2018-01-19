@@ -2,6 +2,10 @@
 
 # img-svg-inline-loader
 
+[![npm](https://img.shields.io/npm/v/img-svg-inline-loader.svg?style=flat)](https://www.npmjs.com/package/img-svg-inline-loader)
+[![npm](https://img.shields.io/npm/dt/img-svg-inline-loader.svg?style=flat)](https://www.npmjs.com/package/img-svg-inline-loader)
+[![npm](https://img.shields.io/npm/l/img-svg-inline-loader.svg?style=flat)](https://www.npmjs.com/package/img-svg-inline-loader)
+
 Webpack loader used for inline replacement of SVG reference in src attribute of img tags with actual content of SVG file.
 
 > Loader has built-in [SVGO](https://github.com/svg/svgo) support for SVG optimization.
@@ -57,7 +61,9 @@ Default options:
 ```
 In strict mode loader replaces only img tags with attribute `svg-inline` or `data-svg-inline`. If strict mode is disabled, loader replaces all img tags.
 
-[SVGO](https://github.com/svg/svgo) documentation can be found [here](https://github.com/svg/svgo).
+[SVGO](https://github.com/svg/svgo) documentation can be found [here](https://github.com/svg/svgo). If you do not want use [SVGO](https://github.com/svg/svgo), set it to null.
+
+Notes: User-defined options are not deep-merged with default options.
 
 ---
 

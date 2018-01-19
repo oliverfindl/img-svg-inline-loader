@@ -1,5 +1,5 @@
 /**
- * img-svg-inline-loader v1.1.0 (2018-01-19)
+ * img-svg-inline-loader v1.2.0 (2018-01-19)
  * Copyright 2018 Oliver Findl
  * @license MIT
  */
@@ -23,7 +23,7 @@ module.exports = function(content) {
 	this.cacheable && this.cacheable();
 
 	const options = Object.assign({}, DEFAULT_OPTIONS, loaderUtils.getOptions(this));
-	const svgo = new SVGO(options.svgo);
+	const svgo = options.svgo ? new SVGO(options.svgo) : null;
 
 	return content.replace(PATTERN_IMG_SVG, (match, attributesBefore, fileName, attributesAfter) => {
 
@@ -35,9 +35,10 @@ module.exports = function(content) {
 		this.addDependency(filePath);
 
 		let fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
-		svgo.optimize(fileContent, result => {
-			fileContent = result.data;
-		});
+
+		if(svgo) {
+			svgo.optimize(fileContent, result => fileContent = result.data);
+		}
 
 		return fileContent.replace(/^(<svg)\s+/, "$1 " + [attributesBefore, attributesAfter].join(" ").replace(/\s+/g, " ").trim());
 

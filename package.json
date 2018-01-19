@@ -1,6 +1,6 @@
 {
 	"name": "img-svg-inline-loader",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Webpack loader used for inline replacement of SVG reference in src attribute of img tags with actual content of SVG file.",
 	"main": "index.js",
 	"repository": {
