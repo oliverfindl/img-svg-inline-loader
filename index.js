@@ -1,5 +1,5 @@
 /**
- * img-svg-inline-loader v1.2.0 (2018-01-19)
+ * img-svg-inline-loader v1.3.0 (2018-02-10)
  * Copyright 2018 Oliver Findl
  * @license MIT
  */
@@ -11,36 +11,85 @@ const path = require("path");
 const loaderUtils = require("loader-utils");
 const SVGO = require("svgo");
 
-const PATTERN_IMG_SVG = /<img([^>]*?)src[\s="']+([^"']+?\.svg)(?:[\?#][^"']*?)?["']+([^>]*?)\/?>/gi;
-const PATTERN_KEYWORD = /\s+(?:data-)?svg-inline\s*/;
-const DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS = Object.freeze({
+	keyword: "svg-inline",
 	strict: true,
-	svgo: { plugins: [ { cleanupAttrs: true } ] }
-};
+	xhtml: false,
+	svgo: { plugins: [ { cleanupattributes: true } ] }
+});
+
+const PATTERN_ATTRIBUTE_NAME = /^[a-z][a-z-]+?[a-z]$/i;
+//const PATTERN_KEYWORD = /\s+(?:data-)?svg-inline\s+/;
+const PATTERN_IMAGE_SVG = /<img\s+[^>]*src[\s="']+([^"']+\.svg)(?:[\?#][^"']*)?["']+[^>]*\/?>/gi;
+const PATTERN_ATTRIBUTES = /\s*([^\s=]+)[\s=]+(?:"([^"]*)"|'([^']*)')?\s*/g;
+const PATTERN_TAG = /^<|>$/;
+const PATTERN_SVG_OPEN_TAG = /^(<svg)\s+/;
 
 module.exports = function(content) {
 
 	this.cacheable && this.cacheable();
 
-	const options = Object.assign({}, DEFAULT_OPTIONS, loaderUtils.getOptions(this));
-	const svgo = options.svgo ? new SVGO(options.svgo) : null;
+	let options = Object.assign({}, DEFAULT_OPTIONS, loaderUtils.getOptions(this) || {});
+	let svgo = options.svgo ? new SVGO(options.svgo) : null;
+	if(!PATTERN_ATTRIBUTE_NAME.test(options.keyword)) {
+		throw new Error("Keyword " + options.keyword + " is not valid.");
+	}
+	const PATTERN_KEYWORD = new RegExp("\\s+(?:data-)?" + options.keyword + "\\s+");
 
-	return content.replace(PATTERN_IMG_SVG, (match, attributesBefore, fileName, attributesAfter) => {
+	return content.replace(PATTERN_IMAGE_SVG, (image, source) => {
 
-		if(options.strict && !PATTERN_KEYWORD.test(attributesBefore) && !PATTERN_KEYWORD.test(attributesAfter)) {
-			return match;
+		if(options.strict && !PATTERN_KEYWORD.test(image)) {
+			return image;
 		}
 
-		const filePath = loaderUtils.urlToRequest(path.join(this.context, fileName), "/");
-		this.addDependency(filePath);
+		let file = {
+			path: loaderUtils.urlToRequest(path.join(this.context, source), "/")
+		};
+		this.addDependency(file.path);
 
-		let fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
+		try {
+			file.content = fs.readFileSync(file.path, { encoding: "utf-8" });
+		} catch(error) {
+			throw new Error("File " + file.path + " does not exist.");
+		}
 
 		if(svgo) {
-			svgo.optimize(fileContent, result => fileContent = result.data);
+			try {
+				svgo.optimize(file.content, result => file.content = result.data);
+			} catch(error) {
+				throw new Error("SVGO for " + file.path + " failed.");
+			}
 		}
 
-		return fileContent.replace(/^(<svg)\s+/, "$1 " + [attributesBefore, attributesAfter].join(" ").replace(/\s+/g, " ").trim());
+		let attribute, attributes = [];
+		while(attribute = PATTERN_ATTRIBUTES.exec(image)) {
+			if(attribute.index === PATTERN_ATTRIBUTES.lastIndex) {
+				PATTERN_ATTRIBUTES.lastIndex++;
+			}
+			if(attribute[1] && !PATTERN_TAG.test(attribute[1]) && PATTERN_ATTRIBUTE_NAME.test(attribute[1])) {
+				attributes.push({
+					key: attribute[1],
+					value: attribute[2] ? attribute[2] : (options.xhtml ? attribute[1] : "")
+				});
+			}
+		}
+		PATTERN_ATTRIBUTES.lastIndex = 0;
+
+		let keys = attributes.map(attribute => attribute.key);
+		if(keys.indexOf("role") === -1) {
+			attributes.push({
+				key: "role",
+				value: "presentation"
+			});
+		}
+		if(keys.indexOf("focusable") === -1) {
+			attributes.push({
+				key: "focusable",
+				value: "false"
+			});
+		}
+
+		return file.content.replace(PATTERN_SVG_OPEN_TAG, "$1 " + attributes.map(attribute => (["alt", "src"].indexOf(attribute.key) > -1 ? "data-" : "") + attribute.key + "=\"" + attribute.value + "\"").join(" ") + " ");
 
 	});
 
