@@ -1,5 +1,5 @@
 /**
- * img-svg-inline-loader v1.3.0 (2018-02-10)
+ * img-svg-inline-loader v1.3.1 (2018-02-12)
  * Copyright 2018 Oliver Findl
  * @license MIT
  */
@@ -23,7 +23,7 @@ const PATTERN_ATTRIBUTE_NAME = /^[a-z][a-z-]+?[a-z]$/i;
 const PATTERN_IMAGE_SVG = /<img\s+[^>]*src[\s="']+([^"']+\.svg)(?:[\?#][^"']*)?["']+[^>]*\/?>/gi;
 const PATTERN_ATTRIBUTES = /\s*([^\s=]+)[\s=]+(?:"([^"]*)"|'([^']*)')?\s*/g;
 const PATTERN_TAG = /^<|>$/;
-const PATTERN_SVG_OPEN_TAG = /^(<svg)\s+/;
+const PATTERN_SVG_OPEN_TAG = /^(<svg)\s+/i;
 
 module.exports = function(content) {
 
@@ -34,7 +34,7 @@ module.exports = function(content) {
 	if(!PATTERN_ATTRIBUTE_NAME.test(options.keyword)) {
 		throw new Error("Keyword " + options.keyword + " is not valid.");
 	}
-	const PATTERN_KEYWORD = new RegExp("\\s+(?:data-)?" + options.keyword + "\\s+");
+	const PATTERN_KEYWORD = new RegExp("\\s+(?:data-)?" + options.keyword + "\\s+", "i");
 
 	return content.replace(PATTERN_IMAGE_SVG, (image, source) => {
 
@@ -89,7 +89,7 @@ module.exports = function(content) {
 			});
 		}
 
-		return file.content.replace(PATTERN_SVG_OPEN_TAG, "$1 " + attributes.map(attribute => (["alt", "src"].indexOf(attribute.key) > -1 ? "data-" : "") + attribute.key + "=\"" + attribute.value + "\"").join(" ") + " ");
+		return file.content.replace(PATTERN_SVG_OPEN_TAG, "$1 " + attributes.map(attribute => (["alt", "src"].indexOf(attribute.key.toLowerCase()) > -1 ? "data-" : "") + attribute.key + "=\"" + attribute.value + "\"").join(" ") + " ");
 
 	});
 
