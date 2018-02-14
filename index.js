@@ -1,5 +1,5 @@
 /**
- * img-svg-inline-loader v1.3.1 (2018-02-12)
+ * img-svg-inline-loader v1.3.2 (2018-02-14)
  * Copyright 2018 Oliver Findl
  * @license MIT
  */
@@ -75,7 +75,7 @@ module.exports = function(content) {
 		}
 		PATTERN_ATTRIBUTES.lastIndex = 0;
 
-		let keys = attributes.map(attribute => attribute.key);
+		let keys = attributes.map(attribute => attribute.key.toLowerCase());
 		if(keys.indexOf("role") === -1) {
 			attributes.push({
 				key: "role",
