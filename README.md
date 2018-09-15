@@ -1,6 +1,4 @@
-
-
-# img-svg-inline-loader
+# [DEPRECATED] img-svg-inline-loader
 
 [![npm](https://img.shields.io/npm/v/img-svg-inline-loader.svg?style=flat)](https://www.npmjs.com/package/img-svg-inline-loader)
 [![npm](https://img.shields.io/npm/dt/img-svg-inline-loader.svg?style=flat)](https://www.npmjs.com/package/img-svg-inline-loader)
